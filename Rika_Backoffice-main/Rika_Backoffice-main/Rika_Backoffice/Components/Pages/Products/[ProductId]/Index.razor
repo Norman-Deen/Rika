@@ -1,0 +1,194 @@
+﻿@page "/products/{Id}"
+@using Rika_Backoffice.Models
+@using System.Text.Json
+@using System.Text
+@inject HttpClient Http
+@inject IConfiguration _config
+@inject NavigationManager navManager
+@inject IJSRuntime JSRuntime
+
+@attribute [StreamRendering(true)]
+@rendermode @(new InteractiveServerRenderMode(false))
+
+<div class="container">
+    
+    <h3>@Product!.ProductName</h3>
+
+    @switch (status)
+    {
+        case LoadStatus.Loading:
+            <p><em>Loading...</em></p>
+            break;
+        case LoadStatus.Failed:
+            <p><em>Could not fetch products. Please try again later.</em></p>
+            break;
+        case LoadStatus.NoData:
+            <p><em>No products found.</em></p>
+            break;
+        case LoadStatus.Success:
+
+        <EditForm Model="Product" OnValidSubmit="UpdateProduct">
+
+            <div class="form-group">
+                <label>Product Name:</label>
+                <InputText @bind-Value="Product.ProductName" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label>Product Id:</label>
+                <InputText readonly @bind-Value="Product.Id" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label>Product Description:</label>
+                <InputText @bind-Value="Product.ProductDescription" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label>Product Sale Price:</label>
+                <InputNumber @bind-Value="Product.ProductSalePrice" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label>Product Price:</label>
+                <InputNumber @bind-Value="Product.ProductPrice" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label>Product Category:</label>
+                <InputSelect @bind-Value="Product.ProductCategoryId" class="form-control">
+                    <option value="@Product.ProductCategory.CategoryId">@Product.ProductCategory.CategoryName</option>
+                    @foreach (var category in Categories)
+                    {
+                        <option value="@category.CategoryId">@category.CategoryName</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="form-group">
+                <label>Product Size:</label>
+                <InputSelect @bind-Value="Product.ProductSizeId" class="form-control">
+                    <option value="@Product.ProductSizeId">@Product.ProductSize.ProductSizeName</option>
+                    @foreach (var size in Sizes)
+                    {
+                        <option value="@size.Id">@size.ProductSizeName</option>
+                    }
+                </InputSelect>
+
+            </div>
+
+            <div class="form-group">
+                <label>Product Color:</label>
+                <InputSelect @bind-Value="Product.ProductColorId" class="form-control">
+                    <option value="@Product.ProductColorId">@Product.ProductColor.ColorName</option>
+                    @foreach (var color in Colors)
+                    {
+                        <option value="@color.Id">@color.ColorName</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <button class="btn btn-warning mt-2" type="submit">Update Product</button>
+
+        </EditForm>
+        <button class="btn btn-danger mt-2" @onclick="() => DeleteProduct(Product)">Delete Product</button>
+
+        <h1>@StatusMessage</h1>
+
+        break;
+
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public string? Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private ProductModel? Product { get; set; } = new();
+
+    private string StatusMessage { get; set; } = "";
+
+    private List<ProductColorEntity>? Colors { get; set; } = new List<ProductColorEntity>();
+    private List<ProductSizeEntity>? Sizes { get; set; } = new List<ProductSizeEntity>();
+    private List<CategoryEntity>? Categories { get; set; } = new List<CategoryEntity>();
+
+    LoadStatus status = LoadStatus.Loading;
+
+    public enum LoadStatus
+    {
+        Loading,
+        Success,
+        Failed,
+        NoData
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string apiUrl = _config["API_ProductProvider_GetOne"]!;
+        var productResponse = await Http.GetAsync($"{apiUrl}&ProductId={Id}");
+        Product = await productResponse.Content.ReadFromJsonAsync<ProductModel>();
+
+        var colorResponse = await Http.GetAsync("https://rika-productprovider.azurewebsites.net/api/GetAllColors?code=BnPaTGQeB_UdqSPPD81t_LHChr7Zol0HNeqoFMcx2c_UAzFuh7UtOA%3D%3D");
+        Colors = await colorResponse.Content.ReadFromJsonAsync<List<ProductColorEntity>>();
+
+        var sizeResponse = await Http.GetAsync("https://rika-productprovider.azurewebsites.net/api/GetAllSizes?code=AJxItpBsucPBXu6s8A9EX1jY31Jon2H7RyWW9GfCKOEaAzFuPgNoag%3D%3D");
+        Sizes = await sizeResponse.Content.ReadFromJsonAsync<List<ProductSizeEntity>>();
+        Sizes = Sizes.OrderBy(x => x.Id).ToList();
+
+        var categoryResponse = await Http.GetAsync("https://rika-categoryprovider.azurewebsites.net/api/categories?code=GwUqvzaNc2Xjdx1g5DDN9IxOO8siMioDyoSOjWyVY55pAzFu4jmtkw%3D%3D");
+        Categories = await categoryResponse.Content.ReadFromJsonAsync<List<CategoryEntity>>();
+
+        Product.ProductCategory = Categories.FirstOrDefault(x => x.CategoryId == Product.ProductCategoryId);
+
+        status = (Colors?.Count == 0 || Sizes?.Count == 0 || Categories?.Count == 0) ? LoadStatus.NoData : LoadStatus.Success;
+    }
+
+    public async Task UpdateProduct(EditContext context)
+    {
+        var json = JsonSerializer.Serialize(Product);
+
+        var response = await Http.PostAsync("https://rika-productprovider.azurewebsites.net/api/UpdateProduct?code=2Rrt5SGeatA7ovJPpf7VIL-r-c2G_IT0XKCXbUgPjeJOAzFuFTNmLA%3D%3D", new StringContent(json, Encoding.UTF8, "application/json"));
+
+        if (response.IsSuccessStatusCode)
+        {
+            StatusMessage = "Product was successfully updated.";
+        }
+        else
+        {
+            StatusMessage = "Something went wrong, product was not updated.";
+        }
+
+    }
+
+    public async Task DeleteProduct(ProductModel product)
+    {
+        StatusMessage = "";
+        bool isConfirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this product?");
+
+        if (isConfirmed)
+        {
+            var json = JsonSerializer.Serialize(product);
+
+            string apiUrl = _config["API_ProductProvider_DeleteProduct"]!;
+
+            var response = await Http.PostAsync(apiUrl, new StringContent(json, Encoding.UTF8, "application/json"));
+
+            if (response.IsSuccessStatusCode)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Product deleted successfully!");
+
+                navManager.NavigateTo("/products");
+            }
+            else
+            {
+                StatusMessage = "Something went wrong, product was not deleted.";
+            }
+        }
+        else
+        {
+            StatusMessage = "Product deletion was canceled.";
+        }
+    }
+}

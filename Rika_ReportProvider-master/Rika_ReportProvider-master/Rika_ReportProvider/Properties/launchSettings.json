@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Rika_ReportProvider": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7229",
+      "launchBrowser": false
+    }
+  }
+}

@@ -1,0 +1,11 @@
+namespace Rika_OrderProvider.Infrastructure.Tests
+{
+    public class UnitTest1
+    {
+        [Fact]
+        public void Test1()
+        {
+
+        }
+    }
+}

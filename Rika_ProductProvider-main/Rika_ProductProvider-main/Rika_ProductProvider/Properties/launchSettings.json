@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Rika_ProductProvider": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7094",
+      "launchBrowser": false
+    }
+  }
+}

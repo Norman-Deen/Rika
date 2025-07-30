@@ -1,0 +1,37 @@
+﻿@using Rika_WebApp.ViewModels.Profile
+@model ProfileViewModel
+@{
+}
+
+<section id="profile">
+    <div class="container">
+
+        <div class="icons">
+            <i class="fa-solid fa-arrow-left"></i>
+            <i class="fa-regular fa-gear"></i>
+        </div>
+
+        <div class="profile_header">
+            <div class="profile-img"></div>
+            <div class="profile_name">
+                <h5>@Model.FirstName @Model.LastName</h5>
+                <p>@Model.Email</p>
+            </div>
+        </div>
+
+        <nav class="nav_profile">
+            <a class="info_link" asp-controller="Profile" asp-action="Details"><div><i class="fa-solid fa-user"></i>Personal Details</div><i class="fa-solid fa-angle-right"></i></a>
+            <a class="info_link" asp-controller="Profile" asp-action="Details"><div><i class="fa-solid fa-bag-shopping"></i>My Order</div><i class="fa-solid fa-angle-right"></i></a>
+            <a class="info_link" asp-controller="Profile" asp-action="Details"><div><i class="fa-solid fa-heart"></i>My Favourites</div><i class="fa-solid fa-angle-right"></i></a>
+            <a class="info_link" asp-controller="Profile" asp-action="Details"><div><i class="fa-solid fa-truck"></i>Shipping Address</div><i class="fa-solid fa-angle-right"></i></a>
+            <a class="info_link" asp-controller="Profile" asp-action="Details"><div><i class="fa-solid fa-credit-card"></i>My Card</div><i class="fa-solid fa-angle-right"></i></a>
+            <a class="info_link" asp-controller="Profile" asp-action="Details"><div><i class="fa-solid fa-gear"></i>Settings</div><i class="fa-solid fa-angle-right"></i></a>
+        </nav>
+
+        <nav class="nav_profile">
+            <a class="info_link" asp-controller="Profile" asp-action="Details"><div><i class="fa-solid fa-circle-exclamation"></i>FAQs</div><i class="fa-solid fa-angle-right"></i></a>
+            <a class="info_link" asp-controller="Profile" asp-action="Details"><div><i class="fa-solid fa-shield-check"></i>Privacy Policy</div><i class="fa-solid fa-angle-right"></i></a>
+            <a class="info_link" asp-controller="Profile" asp-action="Details"><div><i class="fa-solid fa-envelope"></i>Contact Us</div><i class="fa-solid fa-angle-right"></i></a>
+        </nav>
+    </div>
+</section>

@@ -1,0 +1,112 @@
+﻿@page "/orders"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Rika_Backoffice.Models
+@using System.Text.Json.Serialization
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IConfiguration Configuration
+
+@attribute [StreamRendering(true)]
+@rendermode @(new InteractiveServerRenderMode(false))
+
+<h3>Orders</h3>
+
+@switch (status)
+{
+    case LoadStatus.Loading:
+        <p><em>Loading...</em></p>
+        break;
+    case LoadStatus.Failed:
+        <p><em>Could not fetch orders. Please try again later.</em></p>
+        break;
+    case LoadStatus.NoData:
+        <p><em>No orders found.</em></p>
+        break;
+    case LoadStatus.Success:
+
+        <div class="grid">
+            <QuickGrid Items="FilteredProducts">
+                <PropertyColumn Property="@(o => o.OrderID)" Title="Order Id" Sortable="true" />
+                <PropertyColumn Property="@(o => o.OrderDate)" Title="Date" Sortable="true" Class="title-column" />
+                <PropertyColumn Property="@(o => o.OrderCustomer!.CustomerName)" Title="Customer Name" Sortable="true" Class="customer-name">
+                    <ColumnOptions>
+                        <div class="search-box">
+                            <input type="search" autofocus @bind="customerName" @bind:event="oninput" placeholder="Search name..." />
+                        </div>
+                    </ColumnOptions>
+                </PropertyColumn>
+                <PropertyColumn Property="@(o => o.ProductCount)" Title="Products" Sortable="true" Class="title-column" />
+                <PropertyColumn Property="@(o => o.TotalAmount)" Title="Total Amount" Sortable="true" Class="title-column" />
+                <PropertyColumn Property="@(o => char.ToUpper(o.OrderStatus![0]) + o.OrderStatus.Substring(1).ToLower())" Title="Status" />
+                <TemplateColumn Title="Action">
+                    <NavLink class="btn btn-info" href="@($"/orders/{context.OrderID}")">Details</NavLink>
+                </TemplateColumn>
+            </QuickGrid>
+        </div>
+        
+        break;
+}
+
+@code {
+
+    private IQueryable<OrderModel>? orders;
+    private IQueryable<OrderModel>? FilteredProducts => orders?.Where(o => o.OrderCustomer.CustomerName!.Contains(customerName, StringComparison.CurrentCultureIgnoreCase));
+    private LoadStatus status = LoadStatus.Loading;
+
+    private string customerName = string.Empty;
+
+  
+
+
+
+    private void NavigateToDetails(OrderModel order)
+    {
+        Navigation.NavigateTo($"/orders/{order.OrderID}");
+    }
+
+
+    bool Pending;
+
+  
+
+
+   
+
+    public enum LoadStatus
+    {
+        Loading,
+        Success,
+        Failed,
+        NoData
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await Http.GetAsync(Configuration.GetValue<string>("ORDERPROVIVDER_GETALLORDERS"));
+            if (response.IsSuccessStatusCode)
+            {
+                var orderList = await response.Content.ReadFromJsonAsync<List<OrderModel>>();
+                orders = orderList?.OrderByDescending(o => o.OrderDate).AsQueryable();
+      
+                status = (orders == null || !orders.Any()) ? LoadStatus.NoData : LoadStatus.Success;
+            }
+            else
+            {
+                status = LoadStatus.Failed;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            status = LoadStatus.Failed;
+        }
+    }
+
+   
+
+
+  
+}

@@ -1,0 +1,102 @@
+﻿@using Rika_WebApp.ViewModels.Profile
+@model ProfileFormViewModel
+@{
+    
+}
+
+<section id="personal-details">
+    <div class="container">
+        <div class="user-info">          
+            <form method="post" asp-controller="Profile" asp-action="Details" class="user-info-form" novalidate>
+                @if (ViewData["StatusMessage"] != null)
+                {
+                    var messageParts = ViewData["StatusMessage"]?.ToString()!.Split('|');
+                    var messageType = messageParts?[0];
+                    var messageText = messageParts?[1];
+
+                    <div id="statusMessage" class="alert alert-@messageType mb-3" role="alert">@messageText</div>
+                }
+                <div class="personal-img-form">
+                    <div class="personal-img"></div>
+                       
+                    <button type="button" class="upload-image-btn" onclick="toggleProfileImageInput()">
+                        <label asp-for="@Model.ProfileImageUrl" class="label-form personal-img-label">Upload Image</label>
+                        <i class="fa-solid fa-pen-line"></i>
+                    </button>
+
+                    <input asp-for="@Model.ProfileImageUrl" class="input-field profile-image-url" />
+                    <span asp-validation-for="@Model.ProfileImageUrl" class="text-danger"></span>
+                </div>
+
+                <div class="personal-input">
+                    <label asp-for="@Model.FirstName" class="label-form"></label>
+                    <div class="input-group">
+                        <input asp-for="@Model.FirstName" class="input-field" />
+                        <span asp-validation-for="@Model.FirstName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="personal-input">
+                    <label asp-for="@Model.LastName" class="label-form"></label>
+                    <div class="input-group">
+                        <input asp-for="@Model.LastName" class="input-field" />
+                        <span asp-validation-for="@Model.LastName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="personal-input">
+                    <label asp-for="@Model.Email" class="label-form"></label>
+                    <div class="input-group">
+                        <input asp-for="@Model.Email" type="email" class="input-field" />
+                        <span asp-validation-for="@Model.Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="personal-input">
+                    <label asp-for="@Model.Phonenumber" class="label-form"></label>
+                    <div class="input-group">
+                        <input asp-for="@Model.Phonenumber" type="tel" class="input-field" />
+                        <span asp-validation-for="@Model.Phonenumber" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="personal-input">
+                    <label asp-for="@Model.Age" class="label-form"></label>
+                    <div class="input-group">
+                        <input asp-for="@Model.Age" class="input-field" />
+                        <span asp-validation-for="@Model.Age" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-dark mt-4 mb-5">Save changes</button>
+            </form>
+@*             <form asp-action="DeleteAccount" asp-controller="Profile" method="post">
+                <button type="submit" class="btn btn-danger mb-5">Delete Account</button>
+            </form> *@
+        </div>
+
+        <div class="settings">
+            <h5>Settings</h5>
+            <nav class="nav-settings">
+                <a class="info_link" asp-controller="Profile" asp-action="Details">
+                    <div class="first-item"><i class="fa-sharp fa-solid fa-globe"></i>Language</div>
+                    <i class="fa-solid fa-angle-right"></i>
+                </a>
+                <a class="info_link" asp-controller="Profile" asp-action="Details">
+                    <div class="first-item"><i class="fa-solid fa-bell"></i>Notification</div>
+                    <i class="fa-solid fa-toggle-on"></i>
+                </a>
+                <a class="info_link" asp-controller="Profile" asp-action="Details">
+                    <div class="first-item"><i class="fa-sharp fa-solid fa-moon"></i>Dark Mood</div>
+                    <i class="fa-solid fa-toggle-on"></i>
+                </a>
+                <a class="info_link" asp-controller="Profile" asp-action="Details">
+                    <div class="first-item"><i class="fa-solid fa-circle-question"></i>Help Center</div>
+                    <i class="fa-solid fa-angle-right"></i>
+                </a>
+            </nav>
+        </div>
+
+        <div class="signout">
+            <button class="btn btn-dark"><i class="fa-solid fa-right-from-bracket"></i>  Log Out</button>
+        </div>
+    </div>
+</section>

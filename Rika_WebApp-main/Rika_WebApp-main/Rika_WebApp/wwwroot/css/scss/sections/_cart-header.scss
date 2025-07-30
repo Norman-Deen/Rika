@@ -1,0 +1,25 @@
+.cart-header {
+    height: 70px;
+
+    display: flex;
+    align-items: center;
+
+
+
+    a {
+        text-decoration: none;
+        background-color: #000000;
+        color: #FFFFFF;
+        width: 20px;
+        height: 20px;
+
+        padding: 16px;
+       
+
+        border-radius: 100%;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}

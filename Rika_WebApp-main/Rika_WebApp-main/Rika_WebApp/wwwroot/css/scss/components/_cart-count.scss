@@ -1,0 +1,28 @@
+@media (max-width: 767px) {
+    .cart-count {
+        display: inline-block !important;
+    }
+}
+
+.cart-icon {
+    position: relative; 
+  
+}
+
+.cart-count {
+    position: absolute;
+    top: -5px;
+    left: 15px;
+    background-color: #000000;
+    color: white;
+    border-radius: 100%;
+    padding: 4px 4px;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    line-height: 1;
+}

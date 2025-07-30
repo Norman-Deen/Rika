@@ -1,0 +1,37 @@
+﻿@using Rika_WebApp.ViewComponents
+@{
+}
+
+<header>
+    <div class="container">
+        <div id="nav-menu">
+            <nav>
+
+                <a class="menu-link home-icon" asp-controller="Home" asp-action="Index">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                </a>
+
+                <div class="nav-icons">
+                    <a class="menu-link cart-icon" asp-controller="Cart" asp-action="Index">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span>Cart</span>
+                        <div id="cartCountContainer">
+                            @await Component.InvokeAsync("CartCount")
+                        </div>
+                        
+                    </a>
+                    <a class="menu-link" asp-controller="Home" asp-action="Index">
+                        <i class="fa-solid fa-bell"></i>
+                        <span>Notifications</span>
+                    </a>
+                    <a class="menu-link" asp-controller="Profile" asp-action="Index">
+                        <i class="fa-duotone fa-solid fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+
+                </div>             
+            </nav>
+        </div>
+    </div>
+</header>

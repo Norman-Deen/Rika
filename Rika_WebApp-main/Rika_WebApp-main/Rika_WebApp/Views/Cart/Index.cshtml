@@ -1,0 +1,43 @@
+﻿@using Rika_WebApp.Models
+@model List<CartItemModel>
+
+@{
+    Layout = "_CartLayout";
+}
+
+<div class="container">
+    <div class="my-cart">
+        <h2 class="pb-2">My Cart</h2>
+        @if (!Model.Any())
+        {
+            <p>Your cart is empty.</p>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <div class="cart-item" data-article-number="@item.ArticleNumber">
+                    <div class="cart-img"></div>
+                    <div class="product-details">
+                        <p class="product-name">@item.ProductName</p>
+                        <p class="product-desc">Description</p>
+                        <p class="product-price">$@item.Price.ToString("0.00")</p>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn decrease" onclick="updateCartItem(this, -1)">-</button>
+                        <span class="quantity">@item.Quantity</span>
+                        <button class="quantity-btn increase" onclick="updateCartItem(this, 1)">+</button>
+                    </div>
+                </div>
+            }
+            <div class="cart-checkout">
+                <div class="cart-total">
+                    <p class="cart-total-item">Total (<span id="totalQuantity">@Model.Sum(p => p.Quantity)</span> items):</p>
+                    <p class="cart-total-price">$<span id="totalPrice">@Model.Sum(p => p.Price * p.Quantity).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)</span></p>
+                </div>
+                
+                <button>Proceed to Checkout</button>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,204 @@
+﻿@page "/orders/{OrderId:int}"
+@using Rika_Backoffice.Models
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IConfiguration Configuration
+@inject IJSRuntime JSRuntime
+@attribute [StreamRendering(true)]
+@rendermode @(new InteractiveServerRenderMode(false))
+
+<h3>Order</h3>
+
+<NavLink class="btn btn-primary" href="/orders">Back to Orders</NavLink>
+
+@switch (status)
+{
+    case LoadStatus.Loading:
+        <p><em>Loading...</em></p>
+        break;
+    case LoadStatus.Failed:
+        <p><em>Could not fetch orders. Please try again later.</em></p>
+        break;
+    case LoadStatus.NoData:
+        <p><em>No orders found.</em></p>
+        break;
+    case LoadStatus.Success:
+        <div class="order-details mt-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Order Information</h5>
+                            <p><strong>Order Id:</strong> @OrderId</p>
+                            <p><strong>Order Date:</strong> @order!.OrderDate.ToString("yyyy-MM-dd")</p>
+                            <p><strong>Total Amount:</strong> @order.TotalAmount</p>
+                            <p><strong>Payment Method:</strong> @order.PaymentMethod</p>
+                            <p><strong>Shipment Method:</strong> @order.ShipmentMethod</p>
+                            <p>
+                                <strong>Order Status:</strong>
+                                <select @onchange="UpdateOrderStatus">
+                                    @foreach (var status in newStatus)
+                                    {
+                                        <option value="@status" selected="@((status == order.OrderStatus) ? "selected" : null)">@status</option>
+                                    }
+                                </select>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Customer Information</h5>
+                            <p><strong>Name:</strong> @order.OrderCustomer.CustomerName</p>
+                            <p><strong>Email:</strong> @order.OrderCustomer.CustomerEmail</p>
+                            <p><strong>Phone:</strong> @order.OrderCustomer.CustomerPhone</p>
+                        </div>
+                    </div>
+                </div>
+
+                @if (order.OrderAddress != null)
+                {
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Shipping Address</h5>
+                                <p><strong>Address:</strong> @order.OrderAddress.Address</p>
+                                <p><strong>City:</strong> @order.OrderAddress.City</p>
+                                <p><strong>Postal Code:</strong> @order.OrderAddress.PostalCode</p>
+                                <p><strong>Country:</strong> @order.OrderAddress.Country</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Products</h5>
+                    @if (order.OrderProducts != null && order.OrderProducts.Any())
+                    {
+                        <table class="table ">
+                            <thead>
+                                <tr>
+                                    <th>Article Number</th>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Color</th>
+                                    <th>Size</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in order.OrderProducts)
+                                {
+                                    <tr>
+                                        <td>@product.ArticleNumber</td>
+                                        <td>@product.ProductName</td>
+                                        <td>@product.Quantity</td>
+                                        <td>@product.UnitPrice</td>
+                                        <td>@product.Color</td>
+                                        <td>@product.Size</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p>No products found for this order.</p>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        break;
+}
+
+@code {
+
+
+    [Parameter]
+    public int? OrderId { get; set; }
+
+
+    private List<string> newStatus = new List<string> { "Pending", "Processing", "Shipped", "Delivered", "Cancelled" };
+
+    private OrderModel? order; 
+
+    private LoadStatus status = LoadStatus.Loading;
+
+    public enum LoadStatus
+    {
+        Loading,
+        Success,
+        Failed,
+        NoData
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+
+        try
+        {
+            var getOneUrl = Configuration.GetValue<string>("ORDERPROVIDER_GETONEORDER_URI");
+            var code = Configuration.GetValue<string>("ORDERPROVIDER_GETONEORDER_CODE");
+            var response = await Http.GetAsync($"{getOneUrl}/{OrderId}?code={code}");
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<OrderModel>();
+                order = result!;
+                status = (result == null) ? LoadStatus.NoData : LoadStatus.Success;
+            }
+            else
+            {
+                status = LoadStatus.Failed;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            status = LoadStatus.Failed;
+        }
+    }
+
+    private async Task UpdateOrderStatus(ChangeEventArgs e)
+    {
+        var newStatus = e.Value!.ToString();
+        if (newStatus != null && order != null)
+        {
+            order.OrderStatus = newStatus;
+            try
+            {
+                var updateOneUrl = Configuration.GetValue<string>("ORDERPROVIVDER_UPDATEORDER");
+                var response = await Http.PostAsJsonAsync($"{updateOneUrl}", order);
+                if (response.IsSuccessStatusCode)
+                {
+                    await ShowSuccessAlert();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                await ShowErrorAlert();
+            }
+           
+        }
+    }
+
+    private async Task ShowSuccessAlert()
+    {
+        await JSRuntime.InvokeVoidAsync("alert", "Order status updated successfully.");
+
+    }
+
+    private async Task ShowErrorAlert()
+    {
+        await JSRuntime.InvokeVoidAsync("alert", "An error occurred while updating the order status.");
+    }
+
+}
