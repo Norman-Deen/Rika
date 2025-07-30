@@ -81,3 +81,8 @@ Not intended for production use.
 ---
 
 Made with ❤️ by the **Rika Team**
+## 🔗 Original Team Repository
+
+This project was originally developed as a group collaboration.  
+You can find the original source and full contribution history here:  
+➡️ [Project-Rika on GitHub](https://github.com/Project-Rika)
