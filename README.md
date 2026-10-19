@@ -32,7 +32,7 @@ Rika/
 ├── Rika\_ReportProvider/     # Report generation & logging
 ├── TestRepo2/               # Testing utilities or legacy modules
 
-````
+```
 
 ---
 
@@ -49,7 +49,7 @@ Rika/
 ```bash
 cd Rika_WebApp
 dotnet run
-````
+```
 
 ### Running a Provider (e.g. Product)
 
