@@ -18,21 +18,21 @@ Each member contributed to specific modules such as authentication, product hand
 
 The solution is organized into multiple independent projects:
 
-```
+The component archives are preserved in their existing directories:
 
-Rika/
-├── Rika\_WebApp/             # Main Blazor WebApp (central UI)
-├── Rika\_Backoffice/         # Admin dashboard and routing
-├── Rika\_AccountProvider/    # User authentication & account logic
-├── Rika\_VerificationProvider/ # Email/Phone verification
-├── Rika\_EmailProvider/      # Email service provider
-├── Rika\_ProductProvider/    # Product management
-├── Rika\_CategoryProvider/   # Product category handler
-├── Rika\_OrderProvider/      # Order handling system
-├── Rika\_ReportProvider/     # Report generation & logging
-├── TestRepo2/               # Testing utilities or legacy modules
+- `Rika_WebApp-main/` — web application and business project.
+- `Rika_Backoffice-main/` — Blazor backoffice.
+- `Rika_AccountProvider-main/` — account provider.
+- `Rika_VerificationProvider-main/` — verification provider.
+- `Rika_EmailProvider-main/` — email provider.
+- `Rika_ProductProvider-main/` — product provider.
+- `Rika_CategoryProvider-master/` — category provider.
+- `Rika_OrderProvider-main/` — order provider.
+- `Rika_ReportProvider-master/` — reporting provider.
+- `TestRepo-main/` and `TestRepo2-main/` — additional training snapshots.
 
-```
+Most archives contain a second directory with the same name. The commands below use the actual paths from the repository root.
+
 
 ---
 
@@ -40,21 +40,21 @@ Rika/
 
 ### Prerequisites
 
-- [.NET 7 SDK](https://dotnet.microsoft.com/en-us/download)
+- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download)
 - Visual Studio 2022+ with ASP.NET & Azure workload
 - Azure Functions Core Tools (for Providers)
 
 ### Running the WebApp
 
 ```bash
-cd Rika_WebApp
+cd Rika_WebApp-main/Rika_WebApp-main/Rika_WebApp
 dotnet run
 ```
 
 ### Running a Provider (e.g. Product)
 
 ```bash
-cd Rika_ProductProvider
+cd Rika_ProductProvider-main/Rika_ProductProvider-main/Rika_ProductProvider
 func start
 ```
 
@@ -64,7 +64,7 @@ Repeat for other providers as needed.
 
 ## 🧰 Technologies Used
 
-* Blazor Server (.NET 7)
+* Blazor Server (.NET 8)
 * Azure Functions
 * Entity Framework Core
 * REST APIs
